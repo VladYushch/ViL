@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{%block url %}
+{% if m.tester != Null%}
+    <h5>TESTER</h5>
+    <label>{{m.tester}}</label>
+{%endif%}
+{% if m.dsp != Null%}
+    <h5>Download speed</h5>
+    <label>{{m.dsp}}</label>
+{%endif%}
+{% if m.usp != Null%}
+    <h5>Upload speed</h5>
+    <label>{{m.usp}}</label>
+{%endif%}
+{% if m.ping != Null%}
+    <h5>Ping</h5>
+    <label>{{m.usp}}</label>
+{%endif%}
+{%endblock%}
