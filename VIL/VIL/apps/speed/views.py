@@ -1,7 +1,7 @@
 import datetime
 
 import speedtest
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect,Http404
 from django.shortcuts import render
 import sys, time, io, requests
 from .forms import SizeForm,ServerChoise,WorkMode
@@ -50,13 +50,19 @@ def sptest(request,servers):
     servid = results_dict.get('server').get('id')
     print(str(servid))
     link=(results_dict.get('share'))
-    resoutput =str("Download speed: "+f'{dsp1:.2f}'+"Mbps\nUpload speed: "+f'{usp1:.2f}'+'Mbps\nPing: '+f'{ping1}'+'ms\nServer ID '+f'{servid}')
+    idd=0
+
     if request.user.is_authenticated==True:
             user = request.user
-            user.measurement_set.create(dsp=dsp1,usp=usp1,ping=ping1,servid=servid)
+            a=user.measurement_set.create(dsp=dsp1,usp=usp1,ping=ping1,servid=servid)
+            idd=a.id
     else:
             a=Measurement(dsp=dsp1,usp=usp1,ping=ping1,servid=servid)
             a.save()
+            idd=a.id
+
+    resoutput =str("Download speed: "+f'{dsp1:.2f}'+"Mbps\nUpload speed: "+f'{usp1:.2f}'+'Mbps\nPing: '+f'{ping1}'+'ms\nServer ID '+f'{servid}\n\n'+"Your re"
+                "sult is available for link 127.0.0.1:8000/result/"+f'{idd}')
 
     return render(request,'speed/result.html',{'resoutput':resoutput})
 
@@ -98,15 +104,20 @@ def down5(request,size):
                 sys.stdout.write("\r[%s%s] %s Mbps" % ('=' * done, ' ' * (30-done), dl//(time.perf_counter() - start) / 100000))
         speed = dl/(time.perf_counter()-start)/100000
         restime = (time.perf_counter() - start)
-        resoutput =str(size) + "MB \t"+str(f'{restime:.2f}')+" seconds\t"+str("Speed"+f'{speed:.2f}'+"Mbps")
+        idd=0
+
         if request.user.is_authenticated==True:
             user = request.user
             print('1')
-            user.measurement_set.create(dsp=speed)
+            a=user.measurement_set.create(dsp=speed)
+            idd=a.id
         else:
              a=Measurement(dsp=speed)
-            #a.save()
+             a.save()
+             idd=a.id
 
+        resoutput =str(size) + "MB \t"+str(f'{restime:.2f}')+" seconds\t"+str("Speed"+f'{speed:.2f}'+"Mbps \n \n"+"Your re"
+                "sult is available for link 127.0.0.1:8000/result/"+f'{idd}')
 
 
 
@@ -116,7 +127,11 @@ def historyprint(request):
         'historyprint': Measurement.objects.filter(tester=request.user)
     }
     return render(request,"profile/profile.html",context)
-
-
+def resulturl(request,result_id):
+    try:
+        m=Measurement.objects.get(id=result_id)
+    except:
+        raise Http404("result not found or ttl=0")
+    return render(request,"speed/resulturl.html",{"m":m})
 
 # Create your views here.

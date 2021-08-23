@@ -10,5 +10,6 @@ urlpatterns = [
     path('customer', views.historyprint, name='history'),
     path('speedtest', views.sptest, name='sptest'),
     path('manualspeedtest',views.manualtest, name='manual'),
-    path('auto',views.autotest, name='auto')
+    path('auto',views.autotest, name='auto'),
+    path('result/<int:result_id>', views.resulturl, name="resulturl")
 ]
