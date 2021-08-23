@@ -1,0 +1,10 @@
+{% extends 'base.html'%}
+{%block title%}DOWNLOAD TEST {%endblock%}
+{%block optional%}
+<form action="" method="post">
+    {%csrf_token%}
+    {{form}}</br><button type="submit">Press</button>
+
+</form>
+
+{%endblock%}

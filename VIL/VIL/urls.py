@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('sptest/', include('speed.urls')),
+    path('', include('speed.urls')),
+    path('profile/',include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
 ]

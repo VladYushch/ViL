@@ -1,0 +1,13 @@
+.sidebar-nav {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+.testmode{
+    padding: 1.25em 1.5em 1.5em 1.5em;
+    border-left: 1px solid #a7d7f9;
+    background: #FFF;
+    line-height: 1.6;
+    font-size: 0.875em;
+    border-top: 1px solid #a7d7f9;
+    border-bottom: 1px solid #a7d7f9;
