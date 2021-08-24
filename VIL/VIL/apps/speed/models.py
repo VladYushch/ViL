@@ -16,7 +16,10 @@ class Measurement(models.Model):
     bytes_recieve = models.CharField(max_length=300,null=True)
     servid =models.SmallIntegerField(null=True)
     testdata =models.DateTimeField(default=datetime.datetime.now())
+    size = models.IntegerField(null=True)
+    time=models.DecimalField(max_digits=10,decimal_places=3,null=True)
     rec=models.BooleanField(default=False)
+    available=models.IntegerField(default=1)
 
     class Meta:
         ordering =["-testdata"]

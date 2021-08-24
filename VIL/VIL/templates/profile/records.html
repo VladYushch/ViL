@@ -1,7 +1,12 @@
 {% extends 'base.html'%}
 {%block stats%}{% endblock %}
 {%block optional%}
+{% if records_list%}
 {%for a in records_list%}
-    <a href="{%url 'resulturl1' a.id%}">{{a.id}}</a></br>
+    <a href="{%url 'resulturl1' a.id%}">{{a.id}}  {{a.testdate}}</a></br>
 {%endfor%}
+{%else%}
+<h1><strong>NO AVAILABLE TESTS</strong></h1>
+<h1><strong><a href="{%url 'workmode' %}">FIX IT</a></strong></h1>
+{%endif%}
 {%endblock%}

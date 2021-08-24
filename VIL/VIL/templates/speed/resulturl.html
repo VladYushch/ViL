@@ -19,5 +19,13 @@
 {%endif%}
 <h5>Testdata</h5>
 <label>{{m.testdata}}</label>
+{% if m.size != Null%}
+    <h5>Downloaded size</h5>
+    <label>{{m.size}} MB</label>
+{%endif%}
+{% if m.time != Null%}
+    <h5>Downloaded for a time</h5>
+    <label>{{m.time}} seconds</label>
+{%endif%}
 {%endblock%}
 

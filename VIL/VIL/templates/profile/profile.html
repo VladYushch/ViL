@@ -2,7 +2,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <p>Hi {{ user.username }}!</p>
-  <a href="{%url 'records'%}">check your history</a>
-{%block stats%}{% endblock %}
+  <h3>Hi {{ user.username }}!</h3>
+  <strong><a href="{%url 'records'%}">check your history</a></strong>
+
+{% endblock %}
+{%block stats%}
+<p>Tests made per whole time: {{m}}</p>
+<p>Tests made per day: {{statsperday}}</p>
+<p>Tests made per half a day: {{statsper12h}}</p>
+<p>Daily max download speed {{ddm}}Mb/s  avg speed {{dda}}Mb/s </p>
+<p>Daily max upload speed {{dum}}Mb/s  avg speed {{dua}}Mb/s </p>
+<p>For last 12 hour max download speed {{hdm}}Mb/s  avg speed {{hda}}Mb/s </p>
+<p>For last 12 hour max upload speed {{hum}}Mb/s  avg speed {{hua}}Mb/s </p>
+<p>Max download speed ever {{dm}}Mb/s avg speed for whole time{{da}}Mb/s</p>
+<p>Max upload speed ever {{um}}Mb/s avg speed for whole time{{ua}}Mb/s</p>
 {% endblock %}

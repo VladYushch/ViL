@@ -10,17 +10,21 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import generic
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.db.models import Max,Count,Q
+from django.db.models import Max,Count,Q,Avg
 from django.utils import timezone
 size =0
 
 def homepage(request):
-    u=Measurement.objects.filter(rec=False)
-    i = u.count()
-    t= Measurement.objects.filter(rec=True).count()
-    statsallrec= i+t
+
+    t= Measurement.objects.all().count()
+    cutoffd = datetime.datetime.now()-datetime.timedelta(days=1)
+    cutoffh = datetime.datetime.now()-datetime.timedelta(hours=12)
+    d= Measurement.objects.filter(testdata__gt=cutoffd).count()
+    h= Measurement.objects.filter(testdata__gt=cutoffh).count()
     context ={
-        'statsall':statsallrec
+        'statsall':t,
+        'statsperday':d,
+        'statsper12h':h
     }
 
 
@@ -118,10 +122,10 @@ def down5(request,size):
         if request.user.is_authenticated==True:
             user = request.user
             print('1')
-            a=user.measurement_set.create(dsp=speed)
+            a=user.measurement_set.create(dsp=speed,size=size,time=restime)
             idd=a.id
         else:
-             a=Measurement(dsp=speed)
+             a=Measurement(dsp=speed,size=size,time=restime)
              a.save()
              idd=a.id
 
@@ -162,8 +166,41 @@ from django.views.generic import TemplateView
 
 class HomeView(LoginRequiredMixin, TemplateView):
     template_name = "profile/profile.html"
+
+@login_required()
+def statistics(request):
+    m =  Measurement.objects.filter(tester=request.user).count()
+    cutoffd = datetime.datetime.now()-datetime.timedelta(days=1)
+    cutoffh = datetime.datetime.now()-datetime.timedelta(hours=12)
+    d= Measurement.objects.filter(tester=request.user,testdata__gt=cutoffd).count()
+    h= Measurement.objects.filter(tester=request.user,testdata__gt=cutoffh).count()
+    ddmaxsp = Measurement.objects.filter(tester=request.user,testdata__gt=cutoffd).aggregate(Max('dsp'))
+    ddavgsp = Measurement.objects.filter(tester=request.user,testdata__gt=cutoffd).aggregate(Avg('dsp'))
+    dumaxsp = Measurement.objects.filter(tester=request.user,testdata__gt=cutoffd).aggregate(Max('usp'))
+    duavgsp = Measurement.objects.filter(tester=request.user,testdata__gt=cutoffd).aggregate(Avg('usp'))
+    hdmaxsp = Measurement.objects.filter(tester=request.user,testdata__gt=cutoffh).aggregate(Max('dsp'))
+    hdavgsp = Measurement.objects.filter(tester=request.user,testdata__gt=cutoffh).aggregate(Avg('dsp'))
+    humaxsp = Measurement.objects.filter(tester=request.user,testdata__gt=cutoffh).aggregate(Max('usp'))
+    huavgsp = Measurement.objects.filter(tester=request.user,testdata__gt=cutoffh).aggregate(Avg('usp'))
+    dmaxsp = Measurement.objects.filter(tester=request.user).aggregate(Max('dsp'))
+    davgsp = Measurement.objects.filter(tester=request.user).aggregate(Avg('dsp'))
+    umaxsp = Measurement.objects.filter(tester=request.user).aggregate(Max('usp'))
+    uavgsp = Measurement.objects.filter(tester=request.user).aggregate(Avg('usp'))
+    print(ddmaxsp.get('dsp__max'))
+
+    context ={
+        'm':m,
+        'statsperday':d,
+        'statsper12h':h,
+        'ddm':ddmaxsp.get('dsp__max'),'dum':dumaxsp.get('usp__max'),'dda':ddavgsp.get('dsp__avg'), 'dua':duavgsp.get('usp__avg'),
+        'hdm':hdmaxsp.get('dsp__max'),'hum':humaxsp.get('usp__max'),'hda':hdavgsp.get('dsp__avg'), 'hua':huavgsp.get('usp__avg'),
+        'dm':dmaxsp.get('dsp__max'),'um':umaxsp.get('usp__max'),'da':davgsp.get('dsp__avg'),'ua':uavgsp.get('usp__avg')
+    }
+    return render(request,"profile/profile.html",context)
+
 from django.shortcuts import get_object_or_404
 def records(request):
-    latest_records_list = Measurement.objects.filter(tester=request.user).order_by('-testdata')
+    latest_records_list= Measurement.objects.filter(tester=request.user).order_by('-testdata')
+
     context = {"records_list":latest_records_list}
     return render(request, 'profile/records.html',context)
