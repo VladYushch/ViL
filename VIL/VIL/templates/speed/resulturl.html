@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{%block stats%}{% endblock %}
 {%block url %}
 {% if m.tester != Null%}
     <h5>TESTER</h5>
@@ -16,4 +17,7 @@
     <h5>Ping</h5>
     <label>{{m.usp}}</label>
 {%endif%}
+<h5>Testdata</h5>
+<label>{{m.testdata}}</label>
 {%endblock%}
+

@@ -1,0 +1,7 @@
+{% extends 'base.html'%}
+{%block stats%}{% endblock %}
+{%block optional%}
+{%for a in records_list%}
+    <a href="{%url 'resulturl1' a.id%}">{{a.id}}</a></br>
+{%endfor%}
+{%endblock%}

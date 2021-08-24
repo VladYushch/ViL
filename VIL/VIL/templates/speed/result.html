@@ -1,12 +1,13 @@
 {%extends 'base.html'%}
 {%block title%}{%endblock%}
+{%block stats%}{% endblock %}
 {%block optional%}
 {%block 1%}
 {{resoutput}}</br>
+<a href="result/{{link}}">127.0.0.1/result/{{link}}</a>
 {%endblock%}
 <a href="{{next}}"> Try Again</a>
 <a href="/" >Back to main page</a>
 {%endblock%}
 {%block url %}
-<div><h5>Download speed</h5><p>{{m.dsp}} </p> </div>
 {%endblock%}

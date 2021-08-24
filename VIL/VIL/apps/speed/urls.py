@@ -7,9 +7,12 @@ urlpatterns = [
     path('dtest', views.dtest, name ='dtest'),
     path('dtest5', views.down5,name='down5'),
     path('',views.homepage , name='homepage'),
-    path('customer', views.historyprint, name='history'),
+    path('profil', views.HomeView.as_view(), name='profil'),
     path('speedtest', views.sptest, name='sptest'),
     path('manualspeedtest',views.manualtest, name='manual'),
     path('auto',views.autotest, name='auto'),
-    path('result/<int:result_id>', views.resulturl, name="resulturl")
+    path('result/<int:result_id>', views.resulturl, name="resulturl"),
+    path('profil/result/<int:result_id>', views.resulturl, name="resulturl1"),
+    path('register', views.register, name='register'),
+    path('profil/records', views.records, name='records')
 ]

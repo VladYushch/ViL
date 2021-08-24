@@ -4,8 +4,8 @@ import speedtest
 from django.http import HttpResponse, HttpResponseRedirect,Http404
 from django.shortcuts import render
 import sys, time, io, requests
-from .forms import SizeForm,ServerChoise,WorkMode
-from .models import Measurement
+from .forms import SizeForm,ServerChoise,WorkMode,UserRegistrationForm
+from .models import Measurement, Profile
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import generic
 from django.contrib.auth.models import User
@@ -15,7 +15,16 @@ from django.utils import timezone
 size =0
 
 def homepage(request):
-    return render(request, 'base.html')
+    u=Measurement.objects.filter(rec=False)
+    i = u.count()
+    t= Measurement.objects.filter(rec=True).count()
+    statsallrec= i+t
+    context ={
+        'statsall':statsallrec
+    }
+
+
+    return render(request, 'base.html',context)
 
 def workmode(request):
     return render(request,"speed/genspeed.html")
@@ -61,10 +70,10 @@ def sptest(request,servers):
             a.save()
             idd=a.id
 
-    resoutput =str("Download speed: "+f'{dsp1:.2f}'+"Mbps\nUpload speed: "+f'{usp1:.2f}'+'Mbps\nPing: '+f'{ping1}'+'ms\nServer ID '+f'{servid}\n\n'+"Your re"
-                "sult is available for link 127.0.0.1:8000/result/"+f'{idd}')
+    resoutput =str("Download speed: "+f'{dsp1:.2f}'+"Mbps\nUpload speed: "+f'{usp1:.2f}'+'Mbps\nPing: '+f'{ping1}'+'ms\nServer ID '+f'{servid}')
+    idd
 
-    return render(request,'speed/result.html',{'resoutput':resoutput})
+    return render(request,'speed/result.html',{'resoutput':resoutput,'link':idd})
 
 def dtest(request):
     form = SizeForm(request.POST or None)
@@ -121,12 +130,8 @@ def down5(request,size):
 
 
 
-    return render( request , 'speed/result.html', {'resoutput': resoutput})
-def historyprint(request):
-    context = {
-        'historyprint': Measurement.objects.filter(tester=request.user)
-    }
-    return render(request,"profile/profile.html",context)
+
+    return render( request , 'speed/result.html', {'resoutput': resoutput,'link':idd})
 def resulturl(request,result_id):
     try:
         m=Measurement.objects.get(id=result_id)
@@ -134,4 +139,31 @@ def resulturl(request,result_id):
         raise Http404("result not found or ttl=0")
     return render(request,"speed/resulturl.html",{"m":m})
 
+
+def register(request):
+    if request.method == 'POST':
+        user_form = UserRegistrationForm(request.POST)
+        if user_form.is_valid():
+            # Create a new user object but avoid saving it yet
+            new_user = user_form.save(commit=False)
+            # Set the chosen password
+            new_user.set_password(user_form.cleaned_data['password'])
+            # Save the User object
+            new_user.save()
+            profile = Profile.objects.create(user=new_user)
+            return render(request, 'registration/register_done.html', {'new_user': new_user})
+    else:
+        user_form = UserRegistrationForm()
+    return render(request, 'registration/register.html', {'user_form': user_form})
+
 # Create your views here.
+
+from django.views.generic import TemplateView
+
+class HomeView(LoginRequiredMixin, TemplateView):
+    template_name = "profile/profile.html"
+from django.shortcuts import get_object_or_404
+def records(request):
+    latest_records_list = Measurement.objects.filter(tester=request.user).order_by('-testdata')
+    context = {"records_list":latest_records_list}
+    return render(request, 'profile/records.html',context)

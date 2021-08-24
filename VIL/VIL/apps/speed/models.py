@@ -4,6 +4,7 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.conf import settings
 
 class Measurement(models.Model):
     tester = models.ForeignKey(User,on_delete=models.SET_NULL, null=True)
@@ -28,8 +29,15 @@ class Measurement(models.Model):
         return self.testdata >= timezone.now()-datetime.timedelta(hours=1)
 
 
-class Mstats(models.Model):
-    count = models.IntegerField(null=True)
+class Profile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    #slug=models.SlugField(verbose_name="URL address",unique=True, blank=True, null=True, default='{}')
+    def get_absolute_url(self):
+        return reverse('user_url', kwargs={'slug': self.slug})
+
+    def __str__(self):
+        return 'Profile for user {}'.format(self.user.username)
+
 
 
 

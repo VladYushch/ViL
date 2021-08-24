@@ -27,12 +27,13 @@ SECRET_KEY = 'django-insecure-_m0o!)$myf^v08nhzngc!7@)8ihue5tsx3%@gx_%dk%q!-awfu
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['vil.com','localhost','127.0.0.1']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+
     'speed.apps.SpeedConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'social_django',
+
 ]
 
 MIDDLEWARE = [
@@ -50,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware'
 ]
 
 ROOT_URLCONF = 'VIL.urls'
@@ -67,6 +71,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -103,7 +109,13 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+AUTHENTICATION_BACKENDS = {
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.google.GoogleOAuth',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend'
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -131,8 +143,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 from django.urls import reverse_lazy
 
-LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = reverse_lazy('login')
-LOGOUT_URL = reverse_lazy('logout')
+LOGIN_REDIRECT_URL = 'profil'
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['state']
+SESSION_COOKIE_SECURE = False
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '796169007453-j5s2nst56fuuan4g4lnuugr492j0ual6.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '_G-zC2_brocnGsaOvsUnh8Te'
+SOCIAL_AUTH_FACEBOOK_KEY = '1151703232019019'  # App ID
+SOCIAL_AUTH_FACEBOOK_SECRET ='4d559ca3b22602afe1...'

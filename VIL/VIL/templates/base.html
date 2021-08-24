@@ -27,16 +27,22 @@
           <li><a href="{% url 'workmode' %}">Speedtest</a></li>
 
           {% if user.is_authenticated %}
-          <li><a href="{% url 'history'%}">User: {{ user.get_username }}</a></li>
+          <li><a href="{% url 'profil'%}">User: {{ user.get_username }}</a></li>
           <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
           {% else %}
-          <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
-          {% endif %}
+          <li><a href="{% url 'login'%}?next={{request.path}}">Login</a>
+          <li><a href="{% url 'register'%}">Signup</a></li>
+         {% endif %}
       </ul>
-     {% endblock %}
       </div>
 
     </div>
+    {%block stats%}
+    <div>
+        <p>Tests made per whole time: {{statsall}}</p>
+    </div>
+    {% endblock %}
+    {% endblock %}
     {%block optional%}{%endblock%}
     {% block url%}{%endblock%}
   </div>
