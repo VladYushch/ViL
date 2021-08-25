@@ -38,10 +38,10 @@ def manualtest(request):
         if ser.is_valid():
             a=ser.cleaned_data
             if a=={'serverchoise':'1'}:
-                servers=[8633]
+                servers=[2121]
                 return sptest(request,servers)
             elif a=={'serverchoise':'2'}:
-                servers = [38783]
+                servers = [13542]
                 return sptest(request,servers)
     return render(request,'speed/testdown.html',{'form':ser})
 
@@ -52,7 +52,7 @@ def sptest(request,servers):
     threads=None
     s = speedtest.Speedtest()
     s.get_servers(servers)
-    #s.get_best_server()
+    s.get_best_server()
     s.download(threads=threads)
     s.upload(threads=threads)
     s.results.share()
@@ -69,15 +69,18 @@ def sptest(request,servers):
             user = request.user
             a=user.measurement_set.create(dsp=dsp1,usp=usp1,ping=ping1,servid=servid)
             idd=a.id
+            enddata=a.enddata
     else:
             a=Measurement(dsp=dsp1,usp=usp1,ping=ping1,servid=servid)
             a.save()
             idd=a.id
+            enddata=a.enddata
 
     resoutput =str("Download speed: "+f'{dsp1:.2f}'+"Mbps\nUpload speed: "+f'{usp1:.2f}'+'Mbps\nPing: '+f'{ping1}'+'ms\nServer ID '+f'{servid}')
     idd
 
-    return render(request,'speed/result.html',{'resoutput':resoutput,'link':idd})
+
+    return render(request,'speed/result.html',{'resoutput':resoutput,'link':idd,'enddata':enddata})
 
 def dtest(request):
     form = SizeForm(request.POST or None)
@@ -124,21 +127,23 @@ def down5(request,size):
             print('1')
             a=user.measurement_set.create(dsp=speed,size=size,time=restime)
             idd=a.id
+            enddata=a.enddata
         else:
              a=Measurement(dsp=speed,size=size,time=restime)
              a.save()
              idd=a.id
+             enddata=a.enddata
 
         resoutput =str(size) + "MB \t"+str(f'{restime:.2f}')+" seconds\t"+str("Speed"+f'{speed:.2f}'+"Mbps \n \n"+"Your re"
-                "sult is available for link 127.0.0.1:8000/result/"+f'{idd}')
+                "sult is available for link")
 
 
 
 
-    return render( request , 'speed/result.html', {'resoutput': resoutput,'link':idd})
+    return render( request , 'speed/result.html', {'resoutput': resoutput,'link':idd,'enddata':enddata})
 def resulturl(request,result_id):
     try:
-        m=Measurement.objects.get(id=result_id)
+        m=Measurement.objects.get(id=result_id,enddata__gt=datetime.datetime.now())
     except:
         raise Http404("result not found or ttl=0")
     return render(request,"speed/resulturl.html",{"m":m})
@@ -186,12 +191,15 @@ def statistics(request):
     davgsp = Measurement.objects.filter(tester=request.user).aggregate(Avg('dsp'))
     umaxsp = Measurement.objects.filter(tester=request.user).aggregate(Max('usp'))
     uavgsp = Measurement.objects.filter(tester=request.user).aggregate(Avg('usp'))
+    now= Measurement.objects.filter(tester=request.user,enddata__gt=datetime.datetime.now()).count()
+    after12= Measurement.objects.filter(tester=request.user,enddata__gt=datetime.datetime.now()+datetime.timedelta(hours=12)).count()
     print(ddmaxsp.get('dsp__max'))
 
     context ={
         'm':m,
         'statsperday':d,
         'statsper12h':h,
+        'now':now,'after12':after12,
         'ddm':ddmaxsp.get('dsp__max'),'dum':dumaxsp.get('usp__max'),'dda':ddavgsp.get('dsp__avg'), 'dua':duavgsp.get('usp__avg'),
         'hdm':hdmaxsp.get('dsp__max'),'hum':humaxsp.get('usp__max'),'hda':hdavgsp.get('dsp__avg'), 'hua':huavgsp.get('usp__avg'),
         'dm':dmaxsp.get('dsp__max'),'um':umaxsp.get('usp__max'),'da':davgsp.get('dsp__avg'),'ua':uavgsp.get('usp__avg')
@@ -200,7 +208,35 @@ def statistics(request):
 
 from django.shortcuts import get_object_or_404
 def records(request):
-    latest_records_list= Measurement.objects.filter(tester=request.user).order_by('-testdata')
+    latest_records_list= Measurement.objects.filter(tester=request.user,enddata__gt=datetime.datetime.now()).order_by('-testdata')
 
     context = {"records_list":latest_records_list}
     return render(request, 'profile/records.html',context)
+@login_required()
+def editrecords(request,result_id):
+    try:
+        m=Measurement.objects.get(id=result_id,enddata__gt=datetime.datetime.now())
+        print(m)
+        print(m.enddata)
+
+        if (m.tester==request.user or request.user.is_staff):
+            if request.method=="POST":
+                print(m.tester)
+                print(request.user)
+                m.enddata= request.POST.get('enddata')
+                m.save()
+                print(m.enddata)
+            else:
+                pass
+            # raise Http404("You can't edit this record, you should be owner or administrator")
+
+        else:
+            raise Http404("You can't edit this record, you should be owner or administrator")
+    except:
+        raise Http404("result not found or ttl=0")
+
+    return render(request,"speed/resultedit.html",{"m":m,'m.enddata':m.enddata})
+
+
+
+

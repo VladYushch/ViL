@@ -27,5 +27,8 @@
     <h5>Downloaded for a time</h5>
     <label>{{m.time}} seconds</label>
 {%endif%}
+<h5>End data</h5>
+<label>{{m.enddata}}</label>
+<a href="{%url 'editrec' m.id%}">Change end date</a>
 {%endblock%}
 

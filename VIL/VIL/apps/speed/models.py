@@ -1,3 +1,4 @@
+import random
 import uuid
 import datetime
 from django.db import models
@@ -20,6 +21,7 @@ class Measurement(models.Model):
     time=models.DecimalField(max_digits=10,decimal_places=3,null=True)
     rec=models.BooleanField(default=False)
     available=models.IntegerField(default=1)
+    enddata=models.DateTimeField(default=datetime.datetime.now()+datetime.timedelta(days=random.randrange(0,1),hours=random.randrange(1,23)),null=True)
 
     class Meta:
         ordering =["-testdata"]

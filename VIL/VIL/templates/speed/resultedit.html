@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+    <h1>Edit enddata</h1>
+    <p>You can edit your enddata using the following form:{{m.enddata}}</p>
+    <form  method="post" enctype="multipart/form-data">
+        <input type="datetime-local"  name="enddata">
+        {% csrf_token %}
+        <p><button type="submit" >Save Changes </button></p>
+    </form>
+
+
+{% endblock %}

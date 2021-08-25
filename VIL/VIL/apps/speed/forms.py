@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from .models import Measurement
 SIZE_CHOISES = (
     (1, "5MB"),
     (2, "10MB")
@@ -39,3 +40,4 @@ class UserEditForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('username','email')
+
