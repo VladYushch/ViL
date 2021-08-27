@@ -18,7 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('', include('speed.urls')),
-    path('profile/',include('django.contrib.auth.urls')),
+    path('profile/',include('django.contrib.auth.urls')),#авторизація користувачів
     path('admin/', admin.site.urls),
-    path('', include('social_django.urls', namespace='social'))
+    path('', include('social_django.urls', namespace='social'))# під'єдння додатку для можливості авторизації через соц мережі
 ]
